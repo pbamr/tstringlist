@@ -557,7 +557,6 @@ s64 StringLengthMax(void *self)
 	
 	
 	
-//OS doesn't matter
 s64 LoadFromFile(void *self, char *file_name)
 {
 	long max_bytes = 0;
