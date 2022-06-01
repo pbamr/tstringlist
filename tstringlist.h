@@ -25,6 +25,9 @@
 	
 /*
 EXAMPLES:
+
+TStringList a;
+
 TStringListCreate(&a);
 printf("%ld  %ld %ld %ld\n", a.COUNT_BYTES_FILE, a.COUNT_LINES_FILE, a.TStringList_Length_Max, a.TStringList_Lines);
 a.DynFree(&a);
