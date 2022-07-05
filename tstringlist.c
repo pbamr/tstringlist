@@ -4,8 +4,6 @@
 #include <unistd.h>
 #include <malloc.h>
 #include "tstringlist.h"
-#include "ansistring.h"
-#include "pbmath.h"
 	
 	
 	
