@@ -4,85 +4,103 @@
 #include <unistd.h>
 #include <malloc.h>
 #include "tstringlist.h"
+#include "ansistring.h"
+#include "pbmath.h"
 	
 	
 	
-//EXAMPLES:
-void test0(TStringList *x)
-{
-	
-	x->DynStrcpy(x, 10, "hallo aaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-	
-	
-}
 	
 	
 	
-void test(TStringList x)
-{
+#define list_max 10
+TStringList a[10];
 	
-	x.DynStrcpy(&x, 10, "hallo bbbbbbbbbbbbbbbbbbb");
-	
-	
-}
-	
-
-	
-	
-TStringList b[1000];
-TStringList a;
-TStringList CLEAR;
 	
 	
 //--------------------------------------------------------------------------------------------------
-void main(void) {
-	
-TStringListCreate(&a);
-printf("%ld  %ld %ld %ld\n", a.COUNT_BYTES_FILE, a.COUNT_LINES_FILE, a.TStringList_Length_Max, a.TStringList_Lines);
-a.DynFree(&a);
-a.LoadFromFile(&a, "file.txt");
-	
-for (s64 n = 0; n < a.TStringList_Lines; n++) {
-	printf("%s\n", a.TStringList[n]);
-}
-printf("LoadFrom: %ld  %ld %ld %ld\n\n", a.COUNT_BYTES_FILE, a.COUNT_LINES_FILE, a.TStringList_Length_Max, a.TStringList_Lines);
+int main(int argc, char *argv[]) {
 	
 	
-a.DynFree(&a);
-a.SetDelDUP(&a, true);
-a.LoadFromFile(&a, "file.txt");
 	
-for (s64 n = 0; n < a.TStringList_Lines; n++) {
-	printf("%s\n", a.TStringList[n]);
-}
-printf("LoadFrom with DelDUP: %ld  %ld %ld %ld\n\n", a.COUNT_BYTES_FILE, a.COUNT_LINES_FILE, a.TStringList_Length_Max, a.TStringList_Lines);
 	
-a.Del(&a, 1);
-for (s64 n = 0; n < a.TStringList_Lines; n++) {
-	printf("%s\n", a.TStringList[n]);
-}
-printf("after del: %ld  %ld %ld %ld\n\n", a.COUNT_BYTES_FILE, a.COUNT_LINES_FILE, a.TStringList_Length_Max, a.TStringList_Lines);
+	for (s64 n = 0; n < list_max; n++) {
+		if (TStringListCreate(&a[n]) != 0) { printf("ERROR: CREATE\n"); exit(1); }
+	}
+	
+	
+	a[0].ListSetLength(&a[0], 10);
+	a[0].StringSet(&a[0], 0, "Hallo TStringList 0 0,");
+	a[0].StringSet(&a[0], 5, "Hallo TStringList 0 5,");
+	if (a[0].StringCheck(&a[0], 5) == 0) {
+		printf("%s\n", a[0].TStringList[5]);
+	}
+	if (a[0].StringCheck(&a[0], 0) == 0) {
+		printf("%s\n", a[0].TStringList[0]);
+	}
+	
+	if (a[6].StringCheck(&a[6], 5) == 0) {
+		printf("%s\n", a[6].TStringList[5]);
+	}
+	
+	a[0].StringAdd(&a[0], 0, "aaaaaaaaaaaaaaaax");
+	if (a[0].StringCheck(&a[0], 0) == 0) {
+		printf("0:%s\n", a[0].TStringList[0]);
+	}
+	
+	a[0].StringAdd(&a[0], 0, "bbbbbbbbbbbbbbbbx");
+	if (a[0].StringCheck(&a[0], 0) == 0) {
+		printf("1:%s\n", a[0].TStringList[0]);
+	}
+	
+	a[0].StringAdd(&a[0], 0, a[0].TStringList[0]);
+	a[0].StringAdd(&a[0], 0, a[0].TStringList[0]);
+	a[0].StringAdd(&a[0], 0, a[0].TStringList[0]);
+	a[0].StringAdd(&a[0], 0, a[0].TStringList[0]);
+	if (a[0].StringCheck(&a[0], 0) == 0) {
+		printf("2:%s\n", a[0].TStringList[0]);
+	}
+	
+	a[0].ListDel(&a[0], 5);
+	if (a[0].StringCheck(&a[0], 5) == 0) {
+		printf("ssssssss:%s\n", a[0].TStringList[5]);
+	}
+	
+	a[0].StringAdd(&a[0], 5, "bbbbbbbbbbbbbbbbx");
+	if (a[0].StringCheck(&a[0], 5) == 0) {
+		printf("2:%s\n", a[0].TStringList[5]);
+	}
 
-	
-	
-	
-TStringListCreate(&b[88]);
-printf("%ld\n", b[88].SetLines(&b[88], 1000000));
-printf("setlines: %ld  %ld %ld %ld\n", b[88].COUNT_BYTES_FILE, b[88].COUNT_LINES_FILE, b[88].TStringList_Length_Max, b[88].TStringList_Lines);
-	
-b[88].DynStrcpy(&b[88], 12, "hello");
-b[88].DynStrcat(&b[88], 12, " + hello");
-printf("%s\n", b[88].TStringList[12]);
+	a[0].StringSet(&a[0], 5, "z");
+	if (a[0].StringCheck(&a[0], 5) == 0) {
+		printf("2:%s\n", a[0].TStringList[5]);
+	}
 
-b[88].Del(&b[88], 12);
-b[88].Add(&b[88], "Hello");
-b[88].DynFree(&b[88]);
-	
-	
-	
-	
-	
-	
-	
+	a[0].StringAdd(&a[0], 5, "12345678900x");
+	if (a[0].StringCheck(&a[0], 5) == 0) {
+		printf("2:%s\n", a[0].TStringList[5]);
+	}
+
+	a[0].StringReplace(&a[0], 5, 0, "Yabc");
+	if (a[0].StringCheck(&a[0], 5) == 0) {
+		printf("2:%s\n", a[0].TStringList[5]);
+	}
+
+	a[0].StringDel(&a[0], 5, 0, 14);
+	if (a[0].StringCheck(&a[0], 5) == 0) {
+		printf("2:%s\n", a[0].TStringList[5]);
+	}
+
+
+	a[0].StringAdd(&a[0], 5, "1234567890");
+	if (a[0].StringCheck(&a[0], 5) == 0) {
+		printf("2:%s\n", a[0].TStringList[5]);
+	}
+
+	a[0].StringInsert(&a[0], 5, 2, "abcde");
+	if (a[0].StringCheck(&a[0], 5) == 0) {
+		printf("2:%s\n", a[0].TStringList[5]);
+	}
+
+
 
 }
