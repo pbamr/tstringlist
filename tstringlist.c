@@ -4,7 +4,6 @@
 #include <unistd.h>
 #include <malloc.h>
 #include "tstringlist.h"
-
 	
 	
 	
@@ -28,8 +27,10 @@ int main(int argc, char *argv[]) {
 	
 	
 	a[0].ListSetLength(&a[0], 10);
-	a[0].StringSet(&a[0], 0, "Hallo TStringList 0 0,");
-	a[0].StringSet(&a[0], 5, "Hallo TStringList 0 5,");
+	for (int n = 0; n < 10; n++) {
+		a[0].StringSet(&a[0], n, "Hallo TStringList");
+	}
+
 	if (a[0].StringCheck(&a[0], 5) == 0) {
 		printf("StringSet:%s\n", a[0].TStringList[5]);
 	}
@@ -60,7 +61,7 @@ int main(int argc, char *argv[]) {
 		printf("StringAdd:%s\n", a[0].TStringList[0]);
 	}
 	
-	
+	/* liste einen weniger */
 	a[0].ListDel(&a[0], 5);
 	if (a[0].StringCheck(&a[0], 5) == 0) {
 		printf("ListDel:%s\n", a[0].TStringList[5]);
@@ -105,8 +106,39 @@ int main(int argc, char *argv[]) {
 
 	printf("%lld\n", a[0].StringInsert(&a[0], 5, 1, "zyx"));
 	if (a[0].StringCheck(&a[0], 5) == 0) {
-		printf("StringInsert:%s\n", a[0].TStringList[5]);
+		printf("StringInsert:%s\n\n\n", a[0].TStringList[5]);
 	}
+	
+getchar();
+	a[0].ListSort(&a[0]);
+	for (int n = 0; n < 10; n++) {
+		if (a[0].StringCheck(&a[0], n) == 0) {
+			printf("%s\n\n", a[0].TStringList[n]);
+		}
+	}
+
+getchar();
+	a[0].ListDel(&a[0], 7);
+	/* liste einen weniger */
+	printf("liste einen weniger\n");
+	a[0].ListSort(&a[0]);
+	for (int n = 0; n < 10; n++) {
+		if (a[0].StringCheck(&a[0], n) == 0) {
+			printf("%s\n\n", a[0].TStringList[n]);
+		}
+	}
+
+getchar();
+	a[0].ListAdd(&a[0], "neu dazu");
+
+	printf("liste einen dazu\n");
+	a[0].ListSort(&a[0]);
+	for (int n = 0; n < 10; n++) {
+		if (a[0].StringCheck(&a[0], n) == 0) {
+			printf("%s\n\n", a[0].TStringList[n]);
+		}
+	}
+
 
 
 
