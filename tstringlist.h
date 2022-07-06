@@ -1,4 +1,4 @@
-/*
+/*7
  * Copyright (c) 2022/05/18, 2022.07.06, Peter Boettcher, Germany/NRW, Muelheim Ruhr
  * Urheber: 2022/05/18, 2022.07.6,  Peter Boettcher, Germany/NRW, Muelheim Ruhr
 
@@ -108,6 +108,8 @@ s64 tstringlist_StringInsert(void *self, s64 number, s64 pos, char *insert_strin
 	
 	
 	s64 length = strlen(struct_tstringlist->TStringList[number]);
+	if (pos > length) return(-1);
+	
 	char *buffer = calloc(length + 1, sizeof(char));
 	if (buffer == NULL) return(-1);
 	
@@ -116,8 +118,9 @@ s64 tstringlist_StringInsert(void *self, s64 number, s64 pos, char *insert_strin
 	
 	s64 insert_string_length = strlen(insert_string);
 	
-	length = pos + insert_string_length;
-
+	length += insert_string_length;
+	
+	
 	struct_tstringlist->TStringList[number] = realloc(struct_tstringlist->TStringList[number], (length + 1) * sizeof(char));
 	if (struct_tstringlist->TStringList[number] == NULL) return(-1);
 	
@@ -143,6 +146,8 @@ s64 tstringlist_StringDel(void *self, s64 number, s64 pos, s64 size)
 	if (number >= struct_tstringlist->TStringListLines) return(-1);
 	if (struct_tstringlist->TStringList[number] == NULL) return(-1);
 	
+	
+	if (pos > strlen(struct_tstringlist->TStringList[number]))  return(-1);
 	
 	if ((size + pos) >= strlen(struct_tstringlist->TStringList[number])) size = strlen(struct_tstringlist->TStringList[number]) - pos;
 	

@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include <malloc.h>
 #include "tstringlist.h"
+#include "ansistring.h"
+#include "pbmath.h"
 	
 	
 	
@@ -12,7 +14,7 @@
 	
 #define list_max 10
 TStringList a[10];
-	
+
 	
 	
 //--------------------------------------------------------------------------------------------------
@@ -30,8 +32,9 @@ int main(int argc, char *argv[]) {
 	a[0].StringSet(&a[0], 0, "Hallo TStringList 0 0,");
 	a[0].StringSet(&a[0], 5, "Hallo TStringList 0 5,");
 	if (a[0].StringCheck(&a[0], 5) == 0) {
-		printf("%s\n", a[0].TStringList[5]);
+		printf("StringSet:%s\n", a[0].TStringList[5]);
 	}
+
 	if (a[0].StringCheck(&a[0], 0) == 0) {
 		printf("%s\n", a[0].TStringList[0]);
 	}
@@ -42,12 +45,12 @@ int main(int argc, char *argv[]) {
 	
 	a[0].StringAdd(&a[0], 0, "aaaaaaaaaaaaaaaax");
 	if (a[0].StringCheck(&a[0], 0) == 0) {
-		printf("0:%s\n", a[0].TStringList[0]);
+		printf("StringAdd:%s\n", a[0].TStringList[0]);
 	}
 	
 	a[0].StringAdd(&a[0], 0, "bbbbbbbbbbbbbbbbx");
 	if (a[0].StringCheck(&a[0], 0) == 0) {
-		printf("1:%s\n", a[0].TStringList[0]);
+		printf("StringAdd:%s\n", a[0].TStringList[0]);
 	}
 	
 	a[0].StringAdd(&a[0], 0, a[0].TStringList[0]);
@@ -55,48 +58,55 @@ int main(int argc, char *argv[]) {
 	a[0].StringAdd(&a[0], 0, a[0].TStringList[0]);
 	a[0].StringAdd(&a[0], 0, a[0].TStringList[0]);
 	if (a[0].StringCheck(&a[0], 0) == 0) {
-		printf("2:%s\n", a[0].TStringList[0]);
+		printf("StringAdd:%s\n", a[0].TStringList[0]);
 	}
+	
 	
 	a[0].ListDel(&a[0], 5);
 	if (a[0].StringCheck(&a[0], 5) == 0) {
-		printf("ssssssss:%s\n", a[0].TStringList[5]);
+		printf("ListDel:%s\n", a[0].TStringList[5]);
 	}
+	
 	
 	a[0].StringAdd(&a[0], 5, "bbbbbbbbbbbbbbbbx");
 	if (a[0].StringCheck(&a[0], 5) == 0) {
-		printf("2:%s\n", a[0].TStringList[5]);
+		printf("StringAdd:%s\n", a[0].TStringList[5]);
 	}
 
 	a[0].StringSet(&a[0], 5, "z");
 	if (a[0].StringCheck(&a[0], 5) == 0) {
-		printf("2:%s\n", a[0].TStringList[5]);
+		printf("StringSet:%s\n", a[0].TStringList[5]);
 	}
 
 	a[0].StringAdd(&a[0], 5, "12345678900x");
 	if (a[0].StringCheck(&a[0], 5) == 0) {
-		printf("2:%s\n", a[0].TStringList[5]);
+		printf("StringAdd:%s\n", a[0].TStringList[5]);
 	}
 
 	a[0].StringReplace(&a[0], 5, 0, "Yabc");
 	if (a[0].StringCheck(&a[0], 5) == 0) {
-		printf("2:%s\n", a[0].TStringList[5]);
+		printf("StringReplace:%s\n", a[0].TStringList[5]);
 	}
 
-	a[0].StringDel(&a[0], 5, 0, 14);
+	printf("%lld\n", a[0].StringDel(&a[0], 5, 10, 2));
 	if (a[0].StringCheck(&a[0], 5) == 0) {
-		printf("2:%s\n", a[0].TStringList[5]);
+		printf("StringDel:%s\n", a[0].TStringList[5]);
 	}
 
 
 	a[0].StringAdd(&a[0], 5, "1234567890");
 	if (a[0].StringCheck(&a[0], 5) == 0) {
-		printf("2:%s\n", a[0].TStringList[5]);
+		printf("StringAdd:%s\n", a[0].TStringList[5]);
 	}
 
 	a[0].StringInsert(&a[0], 5, 2, "abcde");
 	if (a[0].StringCheck(&a[0], 5) == 0) {
-		printf("2:%s\n", a[0].TStringList[5]);
+		printf("StringInsert:%s\n", a[0].TStringList[5]);
+	}
+
+	printf("%lld\n", a[0].StringInsert(&a[0], 5, 1, "zyx"));
+	if (a[0].StringCheck(&a[0], 5) == 0) {
+		printf("StringInsert:%s\n", a[0].TStringList[5]);
 	}
 
 
