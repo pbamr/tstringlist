@@ -63,7 +63,7 @@ typedef struct {
 	s64	FILE_COUNT_LINES;
 	
 	s64	TStringListLengthMax;
-	s64	TStringListLines;
+	s64	TStringListCount;
 	
 	bool	LDelDUP;
 	bool	LSORT;
@@ -83,6 +83,9 @@ typedef struct {
 	s64 (*ListSort)		(void *self);
 	s64 (*ListSetSort)	(void *self, bool b);
 	s64 (*ListSetDelDUP)	(void *self, bool b);
+	s64 (*ListIndex)	(void *self, char *search_string);
+	s64 (*ListText)		(void *self, char **TEXT);
+	
 	
 	s64 (*StringSet)	(void *self, s64 number, char *newstring);
 	s64 (*StringAdd)	(void *self, s64 number, char *add_string);
@@ -91,8 +94,57 @@ typedef struct {
 	s64 (*StringReplace)	(void *self, s64 number, s64 pos, char *replace_string);
 	s64 (*StringDel)	(void *self, s64 number, s64 pos, s64 size);
 	s64 (*StringInsert)	(void *self, s64 number, s64 pos, char *insert_string);
+
 	
 } TStringList;
+	
+	
+	
+	
+	
+s64 tstringlist_ListText(void *self, char **TEXT)
+{
+	s64 len	= 0;
+	s64 n	= 0;
+	
+	TStringList *struct_tstringlist = self;
+	
+	if (struct_tstringlist->TStringListCount == 0) return(-1);
+	len = strlen(struct_tstringlist->TStringList[0]) + 2;
+	*TEXT = calloc(len, sizeof(char));
+	strcpy(*TEXT, struct_tstringlist->TStringList[0]);
+	strcat(*TEXT, "\n");
+	
+	
+	if (struct_tstringlist->TStringListCount < 2) return(-1);
+	for (n = 1; n < struct_tstringlist->TStringListCount; n++) {
+		len += strlen(struct_tstringlist->TStringList[n]) + 2;
+		
+		*TEXT = realloc(*TEXT, len * sizeof(char));
+		
+		strcat(*TEXT, struct_tstringlist->TStringList[n]);
+		strcat(*TEXT, "\n");
+		
+	}
+	
+	return(0);
+}
+	
+	
+	
+	
+	
+s64 tstringlist_ListIndex(void *self, char *search_string)
+{
+	TStringList *struct_tstringlist = self;
+	
+	for (s64 n = 0; n < struct_tstringlist->TStringListCount; n++) {
+		if (strstr(struct_tstringlist->TStringList[n], search_string) != NULL) return(n);
+	}
+	
+	return(-1);
+}
+	
 	
 	
 	
@@ -102,8 +154,8 @@ s64 tstringlist_StringInsert(void *self, s64 number, s64 pos, char *insert_strin
 	TStringList *struct_tstringlist = self;
 	
 	if (number < 0 ) return(-1);
-	if (struct_tstringlist->TStringListLines == -1) return(-1);
-	if (number >= struct_tstringlist->TStringListLines) return(-1);
+	if (struct_tstringlist->TStringListCount == -1) return(-1);
+	if (number >= struct_tstringlist->TStringListCount) return(-1);
 	if (struct_tstringlist->TStringList[number] == NULL) return(-1);
 	
 	
@@ -142,8 +194,8 @@ s64 tstringlist_StringDel(void *self, s64 number, s64 pos, s64 size)
 	TStringList *struct_tstringlist = self;
 	
 	if (number < 0 ) return(-1);
-	if (struct_tstringlist->TStringListLines == -1) return(-1);
-	if (number >= struct_tstringlist->TStringListLines) return(-1);
+	if (struct_tstringlist->TStringListCount == -1) return(-1);
+	if (number >= struct_tstringlist->TStringListCount) return(-1);
 	if (struct_tstringlist->TStringList[number] == NULL) return(-1);
 	
 	
@@ -166,8 +218,8 @@ s64 tstringlist_StringReplace(void *self, s64 number, s64 pos, char *replace_str
 	TStringList *struct_tstringlist = self;
 	
 	if (number < 0 ) return(-1);
-	if (struct_tstringlist->TStringListLines == -1) return(-1);
-	if (number >= struct_tstringlist->TStringListLines) return(-1);
+	if (struct_tstringlist->TStringListCount == -1) return(-1);
+	if (number >= struct_tstringlist->TStringListCount) return(-1);
 	if (struct_tstringlist->TStringList[number] == NULL) return(-1);
 	
 	
@@ -201,7 +253,7 @@ s64 tstringlist_ListSort (void *self) {
 	
 	TStringList *struct_tstringlist = self;
 	
-	qsort(struct_tstringlist->TStringList, struct_tstringlist->TStringListLines, sizeof(char *), tstringlist_str_compare);
+	qsort(struct_tstringlist->TStringList, struct_tstringlist->TStringListCount, sizeof(char *), tstringlist_str_compare);
 	
 	return(0);
 	
@@ -246,13 +298,13 @@ s64 tstringlist_ListAdd(void *self, char *newstring)
 	TStringList *struct_tstringlist = self;
 	
 	//New
-	if (struct_tstringlist->TStringListLines == -1) {
+	if (struct_tstringlist->TStringListCount == -1) {
 		struct_tstringlist->TStringList = malloc(1 * sizeof(char *));
 		if (struct_tstringlist->TStringList == NULL) return(-1);
 		
 		struct_tstringlist->TStringList[0] = malloc((strlen(newstring) + 1) * sizeof(char));
 		
-		if (struct_tstringlist->TStringList[struct_tstringlist->TStringListLines] == NULL) {
+		if (struct_tstringlist->TStringList[struct_tstringlist->TStringListCount] == NULL) {
 			//former state
 			free(struct_tstringlist->TStringList);
 			return(-1);
@@ -260,14 +312,14 @@ s64 tstringlist_ListAdd(void *self, char *newstring)
 		
 		
 		strcpy(struct_tstringlist->TStringList[0], newstring);
-		struct_tstringlist->TStringListLines = 1;
+		struct_tstringlist->TStringListCount = 1;
 		
 		return(0);
 	}
 	
 	//backup pointer
 	char **backup_ptr = struct_tstringlist->TStringList;
-	s64 lines = struct_tstringlist->TStringListLines + 1;
+	s64 lines = struct_tstringlist->TStringListCount + 1;
 	
 	//New LINE
 	backup_ptr = realloc(backup_ptr, lines * sizeof(char *));
@@ -275,15 +327,15 @@ s64 tstringlist_ListAdd(void *self, char *newstring)
 	else struct_tstringlist->TStringList = backup_ptr;
 	
 	//MEM Columns
-	struct_tstringlist->TStringList[struct_tstringlist->TStringListLines] = malloc((strlen(newstring) + 1) * sizeof(char));
-	if (struct_tstringlist->TStringList[struct_tstringlist->TStringListLines] == NULL) {
+	struct_tstringlist->TStringList[struct_tstringlist->TStringListCount] = malloc((strlen(newstring) + 1) * sizeof(char));
+	if (struct_tstringlist->TStringList[struct_tstringlist->TStringListCount] == NULL) {
 		//former state
 		struct_tstringlist->TStringList = realloc(struct_tstringlist->TStringList, (lines - 1) * sizeof(char *));
 		return(-1);
 	}
 	
-	strcpy(struct_tstringlist->TStringList[struct_tstringlist->TStringListLines], newstring);
-	struct_tstringlist->TStringListLines++;
+	strcpy(struct_tstringlist->TStringList[struct_tstringlist->TStringListCount], newstring);
+	struct_tstringlist->TStringListCount++;
 	
 	return(0);
 }
@@ -297,7 +349,7 @@ s64 tstringlist_ListMaxStr (void *self)
 	TStringList *struct_tstringlist = self;
 	
 	s64 MAX;
-	for (s64 n = 0; n < struct_tstringlist->TStringListLines; n++) {
+	for (s64 n = 0; n < struct_tstringlist->TStringListCount; n++) {
 		if (struct_tstringlist->TStringList[n] != NULL) {
 			MAX = strlen(struct_tstringlist->TStringList[n]);
 			if (MAX > struct_tstringlist->TStringListLengthMax) struct_tstringlist->TStringListLengthMax = MAX;
@@ -315,9 +367,9 @@ s64 tstringlist_ListFree (void *self)
 {
 	TStringList *struct_tstringlist = self;
 	
-	if (struct_tstringlist->TStringListLines == -1) return(-1);
+	if (struct_tstringlist->TStringListCount == -1) return(-1);
 	
-	for (s64 n = 0; n < struct_tstringlist->TStringListLines; n++) {
+	for (s64 n = 0; n < struct_tstringlist->TStringListCount; n++) {
 		if (struct_tstringlist->TStringList[n] != NULL) free(struct_tstringlist->TStringList[n]);
 	}
 	
@@ -325,7 +377,7 @@ s64 tstringlist_ListFree (void *self)
 	struct_tstringlist->TStringList = NULL;
 	
 	
-	struct_tstringlist->TStringListLines = -1;
+	struct_tstringlist->TStringListCount = -1;
 	struct_tstringlist->TStringListLengthMax = -1;
 	struct_tstringlist->FILE_COUNT_BYTES = -1;
 	struct_tstringlist->FILE_COUNT_LINES = -1;
@@ -399,14 +451,14 @@ s64 tstringlist_ListSetLength(void *self, s64 numbers)
 	TStringList *struct_tstringlist = self;
 	
 	if (numbers < 1) return(-1);
-	if (numbers == struct_tstringlist->TStringListLines) return(-1); //do nothing
+	if (numbers == struct_tstringlist->TStringListCount) return(-1); //do nothing
 	
 	
 	//New
-	if (struct_tstringlist->TStringListLines == -1) {
+	if (struct_tstringlist->TStringListCount == -1) {
 		struct_tstringlist->TStringList = calloc(numbers, sizeof(char *));
 		if (struct_tstringlist->TStringList == NULL) return(-1);
-		struct_tstringlist->TStringListLines = numbers;
+		struct_tstringlist->TStringListCount = numbers;
 		
 		//malloc
 		//for (s64 n = 0; n < numbers; n++) struct_tstringlist->TStringList[n] = NULL;
@@ -415,29 +467,29 @@ s64 tstringlist_ListSetLength(void *self, s64 numbers)
 	}
 	
 	//resize <
-	if (numbers < struct_tstringlist->TStringListLines) {
-		s64 diff = struct_tstringlist->TStringListLines - numbers;
+	if (numbers < struct_tstringlist->TStringListCount) {
+		s64 diff = struct_tstringlist->TStringListCount - numbers;
 		
-		for (s64 n = diff - 1; n < struct_tstringlist->TStringListLines; n++) free(struct_tstringlist->TStringList[n]);
+		for (s64 n = diff - 1; n < struct_tstringlist->TStringListCount; n++) free(struct_tstringlist->TStringList[n]);
 		
 		struct_tstringlist->TStringList = realloc(struct_tstringlist->TStringList, numbers * sizeof(char *));
-		struct_tstringlist->TStringListLines = numbers;
+		struct_tstringlist->TStringListCount = numbers;
 		
 		return(0);
 	}
 	
 	//resize >
-	if (numbers > struct_tstringlist->TStringListLines) {
-		s64 diff = numbers - struct_tstringlist->TStringListLines;
+	if (numbers > struct_tstringlist->TStringListCount) {
+		s64 diff = numbers - struct_tstringlist->TStringListCount;
 		
 		char **tmp_ptr = struct_tstringlist->TStringList;
 		tmp_ptr = realloc(tmp_ptr, numbers * sizeof(char *));
 		if (tmp_ptr == NULL) return(-1);
 		
 		struct_tstringlist->TStringList = tmp_ptr;
-		struct_tstringlist->TStringListLines = numbers;
+		struct_tstringlist->TStringListCount = numbers;
 		
-		for (s64 n = diff - 1; n < struct_tstringlist->TStringListLines; n++) {
+		for (s64 n = diff - 1; n < struct_tstringlist->TStringListCount; n++) {
 			struct_tstringlist->TStringList[n] = NULL;
 		}
 		
@@ -457,8 +509,8 @@ s64 tstringlist_StringCheck (void *self, s64 number)
 	TStringList *struct_tstringlist = self;
 	
 	if (number < 0 ) return(-1);
-	if (struct_tstringlist->TStringListLines == -1) return(-1);
-	if (number >= struct_tstringlist->TStringListLines) return(-1);
+	if (struct_tstringlist->TStringListCount == -1) return(-1);
+	if (number >= struct_tstringlist->TStringListCount) return(-1);
 	if (struct_tstringlist->TStringList[number] == NULL) return(-1);
 	
 	return(0);
@@ -475,9 +527,9 @@ s64 tstringlist_StringSet (void *self, s64 number, char *newstring)
 	TStringList *struct_tstringlist = self;
 	
 	if (number < 0 ) return(-1);
-	if (struct_tstringlist->TStringListLines == -1) return(-1);
+	if (struct_tstringlist->TStringListCount == -1) return(-1);
 	if (struct_tstringlist->TStringList == NULL) return(-1);
-	if (number >= struct_tstringlist->TStringListLines) return(-1);
+	if (number >= struct_tstringlist->TStringListCount) return(-1);
 	
 	
 	if (struct_tstringlist->TStringList[number] != NULL) free(struct_tstringlist->TStringList[number]);
@@ -501,9 +553,9 @@ s64 tstringlist_StringAdd (void *self, s64 number, char *add_string)
 	TStringList *struct_tstringlist = self;
 	
 	if (number < 0 ) return(-1);
-	if (struct_tstringlist->TStringListLines == -1) return(-1);
+	if (struct_tstringlist->TStringListCount == -1) return(-1);
 	if (struct_tstringlist->TStringList == NULL) return(-1);
-	if (number >= struct_tstringlist->TStringListLines) return(-1);
+	if (number >= struct_tstringlist->TStringListCount) return(-1);
 	
 	
 	//New
@@ -540,18 +592,18 @@ s64 tstringlist_StringAdd (void *self, s64 number, char *add_string)
 s64 tstringlist_ListDel(void *self, s64 number)
 {
 	TStringList *struct_tstringlist = self;
-	//s64 lines_max = struct_tstringlist->TStringListLines;
+	//s64 lines_max = struct_tstringlist->TStringListCount;
 	
 	if (number < 0) return(-1);
-	if (number >= struct_tstringlist->TStringListLines) return(-1);
+	if (number >= struct_tstringlist->TStringListCount) return(-1);
 	
 	
 	//if number = last line
-	if (number == struct_tstringlist->TStringListLines - 1) {
+	if (number == struct_tstringlist->TStringListCount - 1) {
 		//delete
 		free(struct_tstringlist->TStringList[number]);
-		struct_tstringlist->TStringList = realloc(struct_tstringlist->TStringList, (struct_tstringlist->TStringListLines - 1) * sizeof(char *));
-		struct_tstringlist->TStringListLines--;
+		struct_tstringlist->TStringList = realloc(struct_tstringlist->TStringList, (struct_tstringlist->TStringListCount - 1) * sizeof(char *));
+		struct_tstringlist->TStringListCount--;
 		return(0);
 	}
 	
@@ -559,10 +611,10 @@ s64 tstringlist_ListDel(void *self, s64 number)
 	free(struct_tstringlist->TStringList[number]);
 	
 	//address last line -> delete line
-	struct_tstringlist->TStringList[number] = struct_tstringlist->TStringList[struct_tstringlist->TStringListLines - 1];
+	struct_tstringlist->TStringList[number] = struct_tstringlist->TStringList[struct_tstringlist->TStringListCount - 1];
 	
-	struct_tstringlist->TStringList = realloc(struct_tstringlist->TStringList, (struct_tstringlist->TStringListLines - 1) * sizeof(char *));
-	struct_tstringlist->TStringListLines--;
+	struct_tstringlist->TStringList = realloc(struct_tstringlist->TStringList, (struct_tstringlist->TStringListCount - 1) * sizeof(char *));
+	struct_tstringlist->TStringListCount--;
 	
 	return(0);
 }
@@ -574,7 +626,7 @@ s64 tstringlist_ListDel(void *self, s64 number)
 s64 tstringlist_ListCount(void *self)
 {
 	TStringList *struct_tstringlist = self;
-	return(struct_tstringlist->TStringListLines);
+	return(struct_tstringlist->TStringListCount);
 }
 	
 	
@@ -586,20 +638,20 @@ s64 tstringlist_ListDelDup(void *self)
 {
 	TStringList *struct_tstringlist = self;
 	
-	qsort(struct_tstringlist->TStringList, struct_tstringlist->TStringListLines, sizeof(char *), tstringlist_str_compare);
+	qsort(struct_tstringlist->TStringList, struct_tstringlist->TStringListCount, sizeof(char *), tstringlist_str_compare);
 	
 	s64 counter = 0;
-	for (s64 n = struct_tstringlist->TStringListLines - 1; n > 0; n--) {
+	for (s64 n = struct_tstringlist->TStringListCount - 1; n > 0; n--) {
 		if (strcmp(struct_tstringlist->TStringList[n - 1], struct_tstringlist->TStringList[n]) == 0) {
 			free(struct_tstringlist->TStringList[n]);
-			struct_tstringlist->TStringList[n] = struct_tstringlist->TStringList[struct_tstringlist->TStringListLines - 1 - counter];
+			struct_tstringlist->TStringList[n] = struct_tstringlist->TStringList[struct_tstringlist->TStringListCount - 1 - counter];
 			counter++;
 		}
 	}
 	
 	
-	struct_tstringlist->TStringListLines -= counter;
-	struct_tstringlist->TStringList = realloc(struct_tstringlist->TStringList, struct_tstringlist->TStringListLines * sizeof(char *));
+	struct_tstringlist->TStringListCount -= counter;
+	struct_tstringlist->TStringList = realloc(struct_tstringlist->TStringList, struct_tstringlist->TStringListCount * sizeof(char *));
 	
 	return(0);
 }
@@ -689,26 +741,26 @@ s64 tstringlist_LoadFromFile(void *self, char *file_name)
 	
 	
 	
-	struct_tstringlist->TStringListLines = lines;
+	struct_tstringlist->TStringListCount = lines;
 	
 	if (struct_tstringlist->LDelDUP == true) {
-		qsort(struct_tstringlist->TStringList, struct_tstringlist->TStringListLines, sizeof(char *), tstringlist_str_compare);
+		qsort(struct_tstringlist->TStringList, struct_tstringlist->TStringListCount, sizeof(char *), tstringlist_str_compare);
 		
 		s64 counter = 0;
-		for (s64 n = struct_tstringlist->TStringListLines - 1; n > 0; n--) {
+		for (s64 n = struct_tstringlist->TStringListCount - 1; n > 0; n--) {
 			if (strcmp(struct_tstringlist->TStringList[n - 1], struct_tstringlist->TStringList[n]) == 0) {
 				free(struct_tstringlist->TStringList[n]);
-				struct_tstringlist->TStringList[n] = struct_tstringlist->TStringList[struct_tstringlist->TStringListLines - 1 - counter];
+				struct_tstringlist->TStringList[n] = struct_tstringlist->TStringList[struct_tstringlist->TStringListCount - 1 - counter];
 				counter++;
 			}
 		}
 		
-		struct_tstringlist->TStringListLines -= counter;
-		struct_tstringlist->TStringList = realloc(struct_tstringlist->TStringList, struct_tstringlist->TStringListLines * sizeof(char *));
+		struct_tstringlist->TStringListCount -= counter;
+		struct_tstringlist->TStringList = realloc(struct_tstringlist->TStringList, struct_tstringlist->TStringListCount * sizeof(char *));
 	}
 	
 	if (struct_tstringlist->LSORT == true) {
-		qsort(struct_tstringlist->TStringList, struct_tstringlist->TStringListLines, sizeof(char *), tstringlist_str_compare);
+		qsort(struct_tstringlist->TStringList, struct_tstringlist->TStringListCount, sizeof(char *), tstringlist_str_compare);
 	}
 	
 	
@@ -740,6 +792,9 @@ s64 TStringListCreate(void *self) {
 	struct_tstringlist->ListSort = &tstringlist_ListSort;
 	struct_tstringlist->ListSetSort = &tstringlist_ListSetSort;
 	struct_tstringlist->ListSetDelDUP = &tstringlist_ListSetDelDUP;
+	struct_tstringlist->ListIndex = &tstringlist_ListIndex;
+	struct_tstringlist->ListText = &tstringlist_ListText;
+	
 	
 	struct_tstringlist->StringSet = &tstringlist_StringSet;
 	struct_tstringlist->StringAdd = &tstringlist_StringAdd;
@@ -754,7 +809,7 @@ s64 TStringListCreate(void *self) {
 	struct_tstringlist->FILE_COUNT_BYTES = -1;
 	struct_tstringlist->FILE_COUNT_LINES = -1;
 	struct_tstringlist->TStringListLengthMax = -1;
-	struct_tstringlist->TStringListLines = -1;
+	struct_tstringlist->TStringListCount = -1;
 	struct_tstringlist->LDelDUP = false;
 	struct_tstringlist->LSORT = false;
 	//(*struct_tstringlist).DelDUP = false;		//geht auch so
