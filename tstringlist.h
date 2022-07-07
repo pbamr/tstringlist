@@ -75,7 +75,7 @@ typedef struct {
 	s64 (*ListSetLength)	(void *self, s64 numbers);
 	s64 (*ListDel)		(void *self, s64 number);
 	s64 (*ListCount)	(void *self);
-	s64 (*LoadFromFile)	(void *self, char *file_name);
+	s64 (*ListLoadFromFile)	(void *self, char *file_name);
 	s64 (*ListDelDup)	(void *self);
 	s64 (*ListFree)		(void *self);
 	s64 (*ListMaxStr)	(void *self);
@@ -784,7 +784,7 @@ s64 TStringListCreate(void *self) {
 	struct_tstringlist->ListSetLength = &tstringlist_ListSetLength;
 	struct_tstringlist->ListDel = &tstringlist_ListDel;
 	struct_tstringlist->ListCount = &tstringlist_ListCount;
-	struct_tstringlist->LoadFromFile = &tstringlist_LoadFromFile;
+	struct_tstringlist->ListLoadFromFile = &tstringlist_LoadFromFile;
 	struct_tstringlist->ListDelDup = &tstringlist_ListDelDup;
 	struct_tstringlist->ListFree = &tstringlist_ListFree;
 	struct_tstringlist->ListMaxStr = &tstringlist_ListMaxStr;
