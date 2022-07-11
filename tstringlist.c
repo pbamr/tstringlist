@@ -79,9 +79,9 @@ int main(int argc, char *argv[])
 	size_t	line_length = 0;
 	ssize_t	line_size = 0;
 
-	printf("INIT b State: %lld\n", ListInitState(&b, 0, sizeof(TStringList), sizeof(b)));
+	printf("INIT b State: %lld\n", tListInitState(&b, 0, sizeof(TStringList), sizeof(b)));
 	if (TStringListCreate(&b, 0, sizeof(TStringList), sizeof(b)) != 0) { printf("ERROR: CREATE\n"); /* exit(-1); */ }
-	printf("INIT b State: %lld\n", ListInitState(&b, 0, sizeof(TStringList), sizeof(b)));
+	printf("INIT b State: %lld\n", tListInitState(&b, 0, sizeof(TStringList), sizeof(b)));
 
 
 	printf("NUMBER: ");
@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
 	TryStrToInt64 (line, &NUMBER, 10);
 
 
-	printf("INIT State: %lld\n", ListInitState(&a[NUMBER], NUMBER, sizeof(TStringList), sizeof(a)));
+	printf("INIT State: %lld\n", tListInitState(&a[NUMBER], NUMBER, sizeof(TStringList), sizeof(a)));
 	//memory Error if NUMBER > list_max. DO NOT USE!
 	printf("INIT State: %lld\n", a[NUMBER].INIT);
 
@@ -97,167 +97,179 @@ int main(int argc, char *argv[])
 		if (TStringListCreate(&a[n], n, sizeof(TStringList), sizeof(a)) != 0) { printf("ERROR: CREATE\n"); /* exit(-1); */ }
 	}
 
-	printf("INIT State: %lld\n", ListInitState(&a[NUMBER], NUMBER, sizeof(TStringList), sizeof(a)));
+	printf("INIT State: %lld\n", tListInitState(&a[NUMBER], NUMBER, sizeof(TStringList), sizeof(a)));
 	//memory Error if NUMBER > list_max.  DO NOT USE!
 	printf("INIT State: %lld\n", a[NUMBER].INIT);
 
-	printf("listfree a: %d\n", ListFree(&a[10000-1], 10000-1, sizeof(TStringList), sizeof(a)));
-	printf("listfree b: %d\n", ListFree(&b, 1, sizeof(TStringList), sizeof(b)));
+	printf("listfree a: %d\n", tListFree(&a[10000-1], 10000-1, sizeof(TStringList), sizeof(a)));
+	printf("listfree b: %d\n", tListFree(&b, 1, sizeof(TStringList), sizeof(b)));
 
 	if (TStringListCreate(&b, 1, sizeof(TStringList), sizeof(b)) != 0) { printf("ERROR: CREATE\n"); /* exit(-1); */ }
-	printf("listfree b: %d\n", ListFree(&b, 0, sizeof(TStringList), sizeof(b)));
+	printf("listfree b: %d\n", tListFree(&b, 0, sizeof(TStringList), sizeof(b)));
 
-	printf("INIT aaa: %lld\n", ListInitState(&a[100000], 100000,sizeof(TStringList), sizeof(a)));
-	printf("INIT aaa: %lld\n", ListInitState(&a[NUMBER], NUMBER, sizeof(TStringList), sizeof(a)));
+	printf("INIT aaa: %lld\n", tListInitState(&a[100000], 100000,sizeof(TStringList), sizeof(a)));
+	printf("INIT aaa: %lld\n", tListInitState(&a[NUMBER], NUMBER, sizeof(TStringList), sizeof(a)));
 
 
 
 printf("key");
 getchar();
 
-	printf("ELEMENTS: %lld\n", ListCount(&a[0], 0, sizeof(TStringList), sizeof(a)));
-	ListSetLength(&a[0], 0, sizeof(TStringList), sizeof(a), 10);
-	printf("ELEMENTs: %lld\n", ListCount(&a[0], 0, sizeof(TStringList), sizeof(a)));
+	printf("ELEMENTS: %lld\n", tListCount(&a[0], 0, sizeof(TStringList), sizeof(a)));
+	tListSetLength(&a[0], 0, sizeof(TStringList), sizeof(a), 10);
+	printf("ELEMENTs: %lld\n", tListCount(&a[0], 0, sizeof(TStringList), sizeof(a)));
 
 	for (int n = 0; n < 10; n++) {
-		StringSet(&a[0], 0, sizeof(TStringList), sizeof(a), n, "Hello TStringList");
+		tStringSet(&a[0], 0, sizeof(TStringList), sizeof(a), n, "Hello TStringList");
 	}
 
-	if (StringCheck(&a[0], 0, sizeof(TStringList), sizeof(a),5) == 0) {
+	if (tStringCheck(&a[0], 0, sizeof(TStringList), sizeof(a),5) == 0) {
 		printf("StringSet:%s\n", a[0].TStringList[5]);
 	}
 
-	if (StringCheck(&a[0],0, sizeof(TStringList), sizeof(a), 0) == 0) {
+	if (tStringCheck(&a[0],0, sizeof(TStringList), sizeof(a), 0) == 0) {
 		printf("%s\n", a[0].TStringList[0]);
 	}
 
-	if (StringCheck(&a[6], 0, sizeof(TStringList), sizeof(a),5) == 0) {
+	if (tStringCheck(&a[6], 0, sizeof(TStringList), sizeof(a),5) == 0) {
 		printf("%s\n", a[6].TStringList[5]);
 	}
 
-	StringAdd(&a[0], 0, sizeof(TStringList), sizeof(a),0, "aaaaaaaaaaaaaaaax");
-	if (StringCheck(&a[0], 0, sizeof(TStringList), sizeof(a),0) == 0) {
+	tStringAdd(&a[0], 0, sizeof(TStringList), sizeof(a),0, "aaaaaaaaaaaaaaaax");
+	if (tStringCheck(&a[0], 0, sizeof(TStringList), sizeof(a),0) == 0) {
 		printf("StringAdd:%s\n", a[0].TStringList[0]);
 	}
 
-	StringAdd(&a[0],0, sizeof(TStringList), sizeof(a), 0, "bbbbbbbbbbbbbbbbx");
-	if (StringCheck(&a[0], 0, sizeof(TStringList), sizeof(a),0) == 0) {
+	tStringAdd(&a[0],0, sizeof(TStringList), sizeof(a), 0, "bbbbbbbbbbbbbbbbx");
+	if (tStringCheck(&a[0], 0, sizeof(TStringList), sizeof(a),0) == 0) {
 		printf("StringAdd:%s\n", a[0].TStringList[0]);
 	}
 
-	StringAdd(&a[0], 0, sizeof(TStringList), sizeof(a),0, a[0].TStringList[0]);
-	StringAdd(&a[0], 0, sizeof(TStringList), sizeof(a),0, a[0].TStringList[0]);
-	StringAdd(&a[0], 0, sizeof(TStringList), sizeof(a),0, a[0].TStringList[0]);
-	StringAdd(&a[0], 0, sizeof(TStringList), sizeof(a),0, a[0].TStringList[0]);
-	if (StringCheck(&a[0], 0, sizeof(TStringList), sizeof(a),0) == 0) {
+	tStringAdd(&a[0], 0, sizeof(TStringList), sizeof(a),0, a[0].TStringList[0]);
+	tStringAdd(&a[0], 0, sizeof(TStringList), sizeof(a),0, a[0].TStringList[0]);
+	tStringAdd(&a[0], 0, sizeof(TStringList), sizeof(a),0, a[0].TStringList[0]);
+	tStringAdd(&a[0], 0, sizeof(TStringList), sizeof(a),0, a[0].TStringList[0]);
+	if (tStringCheck(&a[0], 0, sizeof(TStringList), sizeof(a),0) == 0) {
 		printf("StringAdd:%s\n", a[0].TStringList[0]);
 	}
 
 	/* liste einen weniger */
-	ListDel(&a[0], 0, sizeof(TStringList), sizeof(a), 5);
-	if (StringCheck(&a[0], 0, sizeof(TStringList), sizeof(a),5) == 0) {
+	tListDel(&a[0], 0, sizeof(TStringList), sizeof(a), 5);
+	if (tStringCheck(&a[0], 0, sizeof(TStringList), sizeof(a),5) == 0) {
 		printf("ListDel:%s\n", a[0].TStringList[5]);
 	}
 
 
-	StringAdd(&a[0], 0, sizeof(TStringList), sizeof(a), 5, "bbbbbbbbbbbbbbbbx");
-	if (StringCheck(&a[0], 0, sizeof(TStringList), sizeof(a), 5) == 0) {
+	tStringAdd(&a[0], 0, sizeof(TStringList), sizeof(a), 5, "bbbbbbbbbbbbbbbbx");
+	if (tStringCheck(&a[0], 0, sizeof(TStringList), sizeof(a), 5) == 0) {
 		printf("StringAdd:%s\n", a[0].TStringList[5]);
 	}
 
-	StringSet(&a[0], 0, sizeof(TStringList), sizeof(a), 5, "z");
-	if (StringCheck(&a[0], 0, sizeof(TStringList), sizeof(a), 5) == 0) {
+	tStringSet(&a[0], 0, sizeof(TStringList), sizeof(a), 5, "z");
+	if (tStringCheck(&a[0], 0, sizeof(TStringList), sizeof(a), 5) == 0) {
 		printf("StringSet:%s\n", a[0].TStringList[5]);
 	}
 
-	StringAdd(&a[0], 0, sizeof(TStringList), sizeof(a),5, "12345678900x");
-	if (StringCheck(&a[0], 0, sizeof(TStringList), sizeof(a),5) == 0) {
+	tStringAdd(&a[0], 0, sizeof(TStringList), sizeof(a),5, "12345678900x");
+	if (tStringCheck(&a[0], 0, sizeof(TStringList), sizeof(a),5) == 0) {
 		printf("StringAdd:%s\n", a[0].TStringList[5]);
 	}
 
-	StringReplace(&a[0], 0, sizeof(TStringList), sizeof(a),5, 0, "Yabc");
-	if (StringCheck(&a[0],0, sizeof(TStringList), sizeof(a), 5) == 0) {
+	tStringReplace(&a[0], 0, sizeof(TStringList), sizeof(a),5, 0, "Yabc");
+	if (tStringCheck(&a[0],0, sizeof(TStringList), sizeof(a), 5) == 0) {
 		printf("StringReplace:%s\n", a[0].TStringList[5]);
 	}
 
-	printf("%lld\n", StringDel(&a[0], 0, sizeof(TStringList), sizeof(a),5, 10, 2));
-	if (StringCheck(&a[0], 0, sizeof(TStringList), sizeof(a), 5) == 0) {
+	printf("%lld\n", tStringDel(&a[0], 0, sizeof(TStringList), sizeof(a),5, 10, 2));
+	if (tStringCheck(&a[0], 0, sizeof(TStringList), sizeof(a), 5) == 0) {
 		printf("StringDel:%s\n", a[0].TStringList[5]);
 	}
 
 
-	StringAdd(&a[0], 0, sizeof(TStringList), sizeof(a),5, "1234567890");
-	if (StringCheck(&a[0], 0, sizeof(TStringList), sizeof(a),5) == 0) {
+	tStringAdd(&a[0], 0, sizeof(TStringList), sizeof(a),5, "1234567890");
+	if (tStringCheck(&a[0], 0, sizeof(TStringList), sizeof(a),5) == 0) {
 		printf("StringAdd:%s\n", a[0].TStringList[5]);
 	}
 
-	StringInsert(&a[0], 0, sizeof(TStringList), sizeof(a),5, 2, "abcde");
-	if (StringCheck(&a[0], 0, sizeof(TStringList), sizeof(a),5) == 0) {
+	tStringInsert(&a[0], 0, sizeof(TStringList), sizeof(a),5, 2, "abcde");
+	if (tStringCheck(&a[0], 0, sizeof(TStringList), sizeof(a),5) == 0) {
 		printf("StringInsert:%s\n", a[0].TStringList[5]);
 	}
 
-	printf("%lld\n", StringInsert(&a[0], 0, sizeof(TStringList), sizeof(a),5, 1, "zyx"));
-	if (StringCheck(&a[0], 0, sizeof(TStringList), sizeof(a),5) == 0) {
+	printf("%lld\n", tStringInsert(&a[0], 0, sizeof(TStringList), sizeof(a),5, 1, "zyx"));
+	if (tStringCheck(&a[0], 0, sizeof(TStringList), sizeof(a),5) == 0) {
 		printf("StringInsert:%s\n\n\n", a[0].TStringList[5]);
 	}
 
 
 printf("key");
 getchar();
-	ListSort(&a[0],0, sizeof(TStringList), sizeof(a));
+	tListSort(&a[0],0, sizeof(TStringList), sizeof(a));
 	for (int n = 0; n < 10; n++) {
-		if (StringCheck(&a[0], 0, sizeof(TStringList), sizeof(a),n) == 0) {
+		if (tStringCheck(&a[0], 0, sizeof(TStringList), sizeof(a),n) == 0) {
 			printf("%s\n\n", a[0].TStringList[n]);
 		}
 	}
 
 printf("key");
 getchar();
-	ListDel(&a[0], 0, sizeof(TStringList), sizeof(a),7);
+	tListDel(&a[0], 0, sizeof(TStringList), sizeof(a),7);
 	/* liste einen weniger */
 	printf("list delete one line\n");
-	ListSort(&a[0], 0, sizeof(TStringList), sizeof(a));
+	tListSort(&a[0], 0, sizeof(TStringList), sizeof(a));
 	for (int n = 0; n < 10; n++) {
-		if (StringCheck(&a[0], 0, sizeof(TStringList), sizeof(a),n) == 0) {
+		if (tStringCheck(&a[0], 0, sizeof(TStringList), sizeof(a),n) == 0) {
 			printf("%s\n\n", a[0].TStringList[n]);
 		}
 	}
 
 printf("key");
 getchar();
-	ListAdd(&a[0],0, sizeof(TStringList), sizeof(a), "new string");
+	tListAdd(&a[0],0, sizeof(TStringList), sizeof(a), "new string");
 
 	printf("list new line:\n");
-	ListSort(&a[0], 0,sizeof(TStringList), sizeof(a));
+	tListSort(&a[0], 0,sizeof(TStringList), sizeof(a));
 	for (int n = 0; n < 10; n++) {
-		if (StringCheck(&a[0],0,sizeof(TStringList), sizeof(a), n) == 0) {
+		if (tStringCheck(&a[0],0,sizeof(TStringList), sizeof(a), n) == 0) {
 			printf("%s\n\n", a[0].TStringList[n]);
 		}
 	}
 
 	printf("COUNT: %lld\n", a[0].TStringListCount);
 
-	printf("Index found: %lld\n", ListIndex(&a[0], 0,sizeof(TStringList), sizeof(a), "new string"));
+	printf("Index found: %lld\n", tListIndex(&a[0], 0,sizeof(TStringList), sizeof(a), "new string"));
 
 printf("key");
 getchar();
 	char *TEXT;
-	ListText(&a[0],0,sizeof(TStringList), sizeof(a), &TEXT);
+	tListText(&a[0],0,sizeof(TStringList), sizeof(a), &TEXT);
 	printf("%s", TEXT);
 	free(TEXT);
 
-	for(s64 n = 0; n < 100000000; n++) {
-			ListAdd(&a[5],5,sizeof(TStringList), sizeof(a), "TEXT 0");
+	for(s64 n = 0; n < 300000; n++) {
+		tListAdd(&a[5],5,sizeof(TStringList), sizeof(a), "TEXT 0");
 	}
 
 	printf("init: %lld\n", a[5].TStringListCount);
 
-	StringSet(&a[5], 5, sizeof(TStringList), sizeof(a), 99999999, "hello julia" );
-	printf("Index found: %lld\n", ListIndex(&a[5], 5,sizeof(TStringList), sizeof(a),"hello julia"));
+	tStringSet(&a[5], 5, sizeof(TStringList), sizeof(a), 299999, "hello julia" );
+	printf("Index found: %lld\n", tListIndex(&a[5], 5,sizeof(TStringList), sizeof(a),"hello julia"));
+	printf("299999%s\n\n", a[5].TStringList[299999]);
+
+
+	tStringClear(&a[5], 5, sizeof(TStringList), sizeof(a), 299999 );
+	printf("299999%s\n\n", a[5].TStringList[299999]);
+
+	if (tStringCheck(&a[5], 5, sizeof(TStringList), sizeof(a), 299999) == 0)
+		printf("2999%s\n\n", a[5].TStringList[299999]);
+
+
+
+
 
 printf("last key");
 getchar();
-	ListFree(&a[5], 5, sizeof(TStringList), sizeof(a));
-	printf("%p   %lld  %lld\n", a[5].TStringList, a[5].TStringListCount, ListCount(&a[5], 5,sizeof(TStringList), sizeof(a)));
+	tListFree(&a[5], 5, sizeof(TStringList), sizeof(a));
+	printf("%p   %lld  %lld\n", a[5].TStringList, a[5].TStringListCount, tListCount(&a[5], 5,sizeof(TStringList), sizeof(a)));
 
 }
